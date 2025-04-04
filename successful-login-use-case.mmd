@@ -1,0 +1,18 @@
+---
+title: Use Case; Client User Login Successfully
+---
+flowchart LR
+    A[User] --> |Login Button Clicked| B
+    B(Successful Login) --> C
+    C@{shape: comment, label: "1.The user clicks on the \"Login\" button.
+        \ 
+        1.Client sends a JSON string Message containing the username and password to be validated.
+        2.Server returns a JSON string Message indicating a successful login and the collection of products being auctioned.
+        \ 
+        1.Login form closes.
+        2.Display a successful login message \"somewhere\".
+        3.Display the main form where the User will see the updated view with all the auctioned products.
+    "}
+    style C text-align:left
+    style C shape:comment
+
