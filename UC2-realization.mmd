@@ -1,0 +1,26 @@
+sequenceDiagram
+
+actor User
+participant MainForm
+participant MainController
+participant CommController
+participant WebSocket
+participant controller as Rust Controller
+participant CLI as Rust CLI
+
+User ->> MainForm: BidAddClick(object sender, EventArgs e)
+MainForm ->> MainController: AddClickHandler(String name, decimal bid)
+alt Bid is valid
+    MainController ->> CommController: SendBid(String name, decimal bid, int id)
+    CommController ->> WebSocket: Send(String json)
+    WebSocket ->> controller: read.for_each()
+    controller ->> CLI: notify(string msg)
+    controller ->> WebSocket: write.send(string json)
+    WebSocket ->> CommController: OnMessage(object Sender, MessageEventArgs e)
+    CommController ->> MainController: VerifyBid(MessageEventArgs e)
+    alt Bid is invalid after server check
+        MainController ->> MainForm: DisplayMessage(String msg)
+    end
+else Bid is invalid after client check
+    MainController ->> MainForm: DisplayMessage(String msg)
+end 

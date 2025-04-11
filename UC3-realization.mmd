@@ -1,0 +1,16 @@
+sequenceDiagram
+
+actor User
+participant CLI as Rust CLI
+participant controller as Rust Controller
+participant WebSocket
+participant CommController
+participant MainController
+participant MainForm
+
+User ->> CLI: reader.next_line()
+CLI ->> controller: tx.send(product)
+controller ->> WebSocket: Send(string json)
+WebSocket ->> CommController: OnMessage(object Sender, MessageEventArgs e)
+CommController ->> MainController: CreateProduct(String name, int id)
+MainController ->> MainForm: DiplayMessage(String msg)

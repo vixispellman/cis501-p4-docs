@@ -1,0 +1,26 @@
+sequenceDiagram
+
+actor User
+participant MainForm
+participant LoginForm
+participant MainController
+participant CommController
+participant WebSocket
+participant controller as Rust Controller
+participant CLI as Rust CLI
+
+User ->> LoginForm: LoginClick(object sender, EventArgs e)
+LoginForm ->> MainController: PassMessage(String un, String pw)
+MainController ->> CommController: SendMessage(String un, String pw)
+CommController ->> WebSocket: Send(String json)
+WebSocket ->> controller: read.for_each()
+controller ->> CLI: user_login(string un)
+controller ->> WebSocket: write.send(string json)
+WebSocket ->> CommController: OnMessage(object Sender, MessageEventArgs e)
+CommController ->> MainController: ReturnMessage(bool isLoggedIn)
+alt Successful Login
+    MainController ->> LoginForm: Destroy()
+    MainController ->> MainForm: Initialize()
+else Failed Login
+    MainController ->> LoginForm: ResetState()
+end
