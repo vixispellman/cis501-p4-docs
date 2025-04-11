@@ -1,0 +1,25 @@
+stateDiagram
+
+PreLoginIdle: Pre-login, Idle
+Username: Username Entered
+Password: Username and Password Entered
+AwaitVerify: Awaiting Credential Verification From Server
+Idle: Logged-in, Idle
+AwaitAddBid: Awaiting Bid Verification From Server
+
+[*] --> PreLoginIdle: Program starts
+PreLoginIdle --> Username: Username text field is populated / Password text field is enabled
+Username --> Password: Password text field is populated / Enable submit button
+Password --> AwaitVerify: Submit button pressed / Sends info to CommController for server
+AwaitVerify --> PreLoginIdle: Credentials were invalid / Signal LoginForm to reset 
+AwaitVerify --> Idle: Credentials were valid / Signal LoginForm to close, signal MainForm to open
+Idle --> AwaitAddBid: Bid info received, MainController accepts info / Send info to CommController for server
+AwaitAddBid --> Idle: Server rejects info / Signal MainForm to reset user input
+AwaitAddBid --> Idle: Server accepts info and delivers updated products list / Product list refreshed
+Idle --> Idle: New info received from server / Product list refreshed
+Idle --> [*]: Program exited
+PreLoginIdle --> [*]: Program exited
+Username --> [*]: Program exited
+Password --> [*]: Program exited
+AwaitAddBid --> [*]: Program exited
+AwaitVerify --> [*]: Program exited
