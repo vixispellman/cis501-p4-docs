@@ -1,0 +1,29 @@
+stateDiagram
+
+Idle: Not Connected, Idle
+Validating: Validating User Credentials
+Connected: Connected to User, Idle
+NewBid: New Bid Update
+DieBid: Bid Expiration Update
+UpdateProduct: Updating Products
+
+[*] --> Idle: Program starts
+Idle --> Validating: New username and password received
+Validating --> Connected: Username exists, password matches / Connection established, list of current bids sent to client
+Validating --> Connected: Username did not exist / New user created, connection established, list of current bids sent to client
+Validating --> Idle: Username exists, password does not match / Send login failure message
+Connected --> Idle: Client connection lost
+Connected --> NewBid: User places a bid
+NewBid --> Connected: Sent updated bids to all connections
+Connected --> UpdateProduct: Admin creates new product
+UpdateProduct --> Connected: Sent updated products to all connections
+Connected --> DieBid: Admin triggers expiration on a bid
+DieBid --> Connected: Sent updated bids to all connections
+
+Idle --> [*]: Program exited 
+Validating --> [*]: Program exited 
+Connected --> [*]: Program exited 
+NewBid --> [*]: Program exited
+DieBid --> [*]: Program exited
+UpdateProduct --> [*]: Program exited
+

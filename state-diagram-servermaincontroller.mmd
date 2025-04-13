@@ -1,0 +1,23 @@
+stateDiagram
+
+PreLoginIdle: Pre-login Idle
+Username: Username Entered
+Idle: Admin Logged-in, Idle
+ProductCreate: New Product Creation
+BidExpire: Bid Expiration Selection
+
+[*] --> PreLoginIdle: Program starts
+PreLoginIdle --> Username: Username entered into CLI / Prompt user for password
+Username --> Idle: Password was valid
+Username --> PreLoginIdle: Password was invalid
+Idle --> PreLoginIdle: User logged out
+Idle --> ProductCreate: User selects to add product / CLI prompts for product name
+ProductCreate --> Idle: User enters product name / Product ID is generated, product added to model and sent to communication controller
+Idle --> BidExpire: User selects to end a bid / CLI prompts for product selection
+BidExpire --> Idle: User selects product / Sends product info to communication controller to notify users of bid expiration
+
+PreLoginIdle --> [*]: Program exited
+Username --> [*]: Program exited
+Idle --> [*]: Program exited
+BidExpire --> [*]: Program exited
+ProductCreate --> [*]: Program exited

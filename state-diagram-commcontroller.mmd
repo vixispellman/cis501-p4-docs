@@ -1,5 +1,6 @@
 stateDiagram
 
+Idle: Idle
 SendMsg: Sending Message
 ReceiveMsg: Data Received
 
@@ -8,4 +9,7 @@ Idle --> SendMsg: Received message from MainControler
 SendMsg --> Idle: Message sent to server
 Idle --> ReceiveMsg: Received message from server
 ReceiveMsg --> Idle: Message sent to MainController
+
 Idle --> [*]: Program exits
+SendMsg --> [*]: Program exits
+ReceiveMsg --> [*]: Program exits
