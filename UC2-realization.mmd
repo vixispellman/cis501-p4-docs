@@ -2,25 +2,28 @@ sequenceDiagram
 
 actor User
 participant MainForm
+participant ProductsProxy
 participant MainController
+participant Decoder
 participant CommController
 participant WebSocket
-participant controller as Rust Controller
-participant CLI as Rust CLI
+participant user_controller
+participant admin_controller
+participant view
 
-User ->> MainForm: BidAddClick(object sender, EventArgs e)
-MainForm ->> MainController: AddClickHandler(String name, decimal bid)
-alt Bid is valid
-    MainController ->> CommController: SendBid(String name, decimal bid, int id)
-    CommController ->> WebSocket: Send(String json)
-    WebSocket ->> controller: read.for_each()
-    controller ->> CLI: notify(string msg)
-    controller ->> WebSocket: write.send(string json)
-    WebSocket ->> CommController: OnMessage(object Sender, MessageEventArgs e)
-    CommController ->> MainController: VerifyBid(MessageEventArgs e)
-    alt Bid is invalid after server check
-        MainController ->> MainForm: DisplayMessage(String msg)
-    end
-else Bid is invalid after client check
-    MainController ->> MainForm: DisplayMessage(String msg)
-end 
+User ->> MainForm: PlaceBidClick(object sender, EventArgs e)
+MainForm ->> MainController: HandleState(State state, string[] args)
+MainController ->> MainController: ParseArguments(string[] args)
+MainController ->> Decoder: Encode(Message msg)
+MainController ->> CommController: SendMessage(string json)
+CommController ->> WebSocket: Send(String json)
+WebSocket ->> user_controller: read.for_each()
+user_controller ->> admin_controller: to_admin_controller.send(UserCtrlrMsg msg)
+admin_controller->> view: to_view.send(AdminCtrlrMsgView msg)
+uer_controller ->> WebSocket: write.send(string json)
+WebSocket ->> CommController: OnMessage(object Sender, MessageEventArgs e)
+CommController ->> MainController: HandleState(State state, string[] args)
+MainController ->> Decoder: DecodeJson(string json)
+MainController ->> MainController: HandleMessage(Message msg)
+MainController ->> ProductsProxy: InsertBid(int id, Bid bid, int quantity)
+MainController ->> MainForm: DisplayState(State state, string arg)

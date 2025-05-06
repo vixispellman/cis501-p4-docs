@@ -1,16 +1,21 @@
 sequenceDiagram
 
 actor User
-participant CLI as Rust CLI
-participant controller as Rust Controller
+participant view
+participant admin_controller
+participant user_controller
 participant WebSocket
 participant CommController
 participant MainController
 participant MainForm
 
-User ->> CLI: reader.next_line()
-CLI ->> controller: tx.send(product)
-controller ->> WebSocket: Send(string json)
+User ->> view: reader.next_line()
+view ->> admin_controller: to_admin_controller.send(ViewMsg msg)
+admin_controller ->> user_controller: to_user_controller.send(AdminCtrlrMsgUserCtrlr msg)
+user_controller ->> WebSocket: write.send(string json)
 WebSocket ->> CommController: OnMessage(object Sender, MessageEventArgs e)
-CommController ->> MainController: CreateProduct(String name, int id)
-MainController ->> MainForm: DiplayMessage(String msg)
+CommController ->> MainController: HandleState(State state, string[] args)
+MainController ->> Decoder: DecodeJson(string json)
+MainController ->> MainController: HandleMessage(Message msg)
+MainController ->> ProductsProxy: InsertProduct(Product prod)
+MainController ->> MainForm: DisplayState(State state, string arg)

@@ -4,23 +4,30 @@ actor User
 participant MainForm
 participant LoginForm
 participant MainController
+participant Decoder
 participant CommController
 participant WebSocket
-participant controller as Rust Controller
-participant CLI as Rust CLI
+participant user_controller
+participant admin_controller
+participant view
 
-User ->> LoginForm: LoginClick(object sender, EventArgs e)
-LoginForm ->> MainController: PassMessage(String un, String pw)
-MainController ->> CommController: SendMessage(String un, String pw)
+User ->> LoginForm: UxLoginBtn_Click(object sender, EventArgs e)
+LoginForm ->> MainController: HandleState(State state, string[] args)
+MainController ->> MainController: ParseArguments(string[] args)
+MainController ->> Decoder: EncodeJson(Message msg)
+MainController ->> CommController: SendMessage(string json)
 CommController ->> WebSocket: Send(String json)
-WebSocket ->> controller: read.for_each()
-controller ->> CLI: user_login(string un)
-controller ->> WebSocket: write.send(string json)
+WebSocket ->> user_controller: read.for_each()
+user_controller ->> admin_controller: to_admin_controller.send(UserCtrlrMsg msg)
+admin_controller ->> view: to_view.send(AdminCtrlrlMsgView msg)
+user_controller ->> WebSocket: write.send(string json)
 WebSocket ->> CommController: OnMessage(object Sender, MessageEventArgs e)
-CommController ->> MainController: ReturnMessage(bool isLoggedIn)
+CommController ->> MainController: HandleState(State state, string[] args)
+MainController ->> Decoder: DecodeJson(string json)
+MainController ->> MainController: HandleMessage(Message msg)
 alt Successful Login
-    MainController ->> LoginForm: Destroy()
-    MainController ->> MainForm: Initialize()
+    MainController ->> LoginForm: DisplayState(State state, string arg)
+    MainController ->> MainForm: MainForm(BindingList<Listing> list, HandleStateDel del)
 else Failed Login
-    MainController ->> LoginForm: ResetState()
+    MainController ->> LoginForm: DisplayState(State state, string arg)
 end
